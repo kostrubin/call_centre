@@ -4,7 +4,7 @@ import java.util.concurrent.LinkedTransferQueue;
 public class CallCentre {
     final int CALLS_NUMBER = 60;
     final int CALLS_FREQUENCY = 1000;
-    final int WAITING_FOR_CALL = 5000;
+    boolean isItWorkingTimeNow = true;
     LinkedTransferQueue<String> clients = new LinkedTransferQueue<>();
 
     public static int getConsultationTime() {
@@ -19,26 +19,22 @@ public class CallCentre {
         try {
             for (int i = 1; i <= CALLS_NUMBER; i++) {
                 Thread.sleep(CALLS_FREQUENCY);
-                clients.add(Thread.currentThread().getName() + " " + i);
                 System.out.printf("Входящий вызов от %s %d\n", Thread.currentThread().getName(), i);
+                clients.add(Thread.currentThread().getName() + " " + i);
             }
         } catch (InterruptedException e) {
             e.getStackTrace();
         }
+        isItWorkingTimeNow = false;
     }
 
     public void answerTheCall() {
         try {
             while(!Thread.interrupted()) {
-                if (clients.isEmpty()) {
-                    Thread.sleep(WAITING_FOR_CALL);
-                }
-
-                String currentClient = clients.poll();
-                System.out.printf("%s ответил %s\n", Thread.currentThread().getName(), currentClient);
+                System.out.printf("%s ответил %s\n", Thread.currentThread().getName(), clients.take());
                 Thread.sleep(getConsultationTime());
 
-                if (clients.isEmpty()) return;
+                if (!isItWorkingTimeNow && clients.isEmpty()) return;
             }
         } catch (InterruptedException e) {
             e.getStackTrace();

@@ -16,6 +16,7 @@ public class Main {
         consultant4.start();
 
         while (Thread.currentThread().isAlive()) {
+            atc.join();
             if (consultants.activeCount() == 0) {
                 System.out.println("Фух, всех обслужили");
                 return;
